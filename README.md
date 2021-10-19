@@ -71,5 +71,5 @@ The following configurations will be made for this project:
 
 ## Summary
 
-This project is an illustration for a basic use case for configuring and writing to a DAC using MSSP1.
+This project is an illustration for a basic use case for writing to a DAC using MSSP1.
 
