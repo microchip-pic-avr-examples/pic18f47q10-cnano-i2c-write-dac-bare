@@ -26,13 +26,15 @@
 
 #define _XTAL_FREQ                      4000000UL
 
-#include <pic18.h>
+//#include <pic18.h>
 #include <xc.h>
-#include <stdint.h>
+//#include <stdint.h>
 
 #define I2C_CLIENT_ADDR     0x48
 #define TC1321_REG_ADDR     0x00
 #define I2C_RW_BIT          0x01
+#define DATA_HIGH           0xFF
+#define DATALENGTH          2
 
 
 static void CLK_Initialize(void);
@@ -47,8 +49,8 @@ static void I2C1_stopCondition(void);
 static void I2C1_sendData(uint8_t data);
 static void I2C1_interruptFlagPolling(void);
 static uint8_t I2C1_getAckstatBit(void);
-static void I2C1_write1ByteRegister(uint8_t address, uint8_t reg, uint8_t data);
-static void I2C1_writeNBytes(uint8_t address, uint8_t data[], size_t len);
+static uint8_t I2C1_write1ByteRegister(uint8_t address, uint8_t reg, uint8_t data);
+static uint8_t I2C1_writeNBytes(uint8_t address, uint8_t reg, uint8_t* data, size_t len);
 
 static void CLK_Initialize(void)
 {
@@ -91,7 +93,7 @@ static void I2C1_Initialize(void)
     /* I2C Host Mode: Clock = F_OSC / (4 * (SSP1ADD + 1)) */
     SSP1CON1bits.SSPM3 = 1;
     
-    /* Set the boud rate devider to obtain the I2C clock at 100000 Hz*/
+    /* Set the baud rate divider to obtain the I2C clock at 100000 Hz*/
     SSP1ADD  = 0x9F;
 }
 
@@ -145,16 +147,20 @@ static void I2C1_sendData(uint8_t byte)
     I2C1_interruptFlagPolling();
 }
 
+
 static uint8_t I2C1_getAckstatBit(void)
 {
-    /* Return ACKSTAT bit */
+    /* Return ACKSTAT bit:
+     * returns 1 if a NACK was received */
     return SSP1CON2bits.ACKSTAT;
 }
 
-static void I2C1_write1ByteRegister(uint8_t address, uint8_t reg, uint8_t data)
+/* Returns a dataSentSuccessful variable, which is 1 if no errors occurred */
+static uint8_t I2C1_write1ByteRegister(uint8_t address, uint8_t reg, uint8_t data)
 {
     /* Shift the 7 bit address and add a 0 bit to indicate write operation */
     uint8_t writeAddress = (address << 1) & ~I2C_RW_BIT;
+    uint8_t dataSentSuccessful = 1;
     
     I2C1_open();
     I2C1_startCondition();
@@ -162,32 +168,34 @@ static void I2C1_write1ByteRegister(uint8_t address, uint8_t reg, uint8_t data)
     I2C1_sendData(writeAddress);
     if (I2C1_getAckstatBit())
     {
-        return ;
+        /* Handle error */
+        dataSentSuccessful = 0;
     }
     
     I2C1_sendData(reg);
     if (I2C1_getAckstatBit())
     {
-        return ;
+        /* Handle error */
+        dataSentSuccessful = 0;
     }
-    
-    
     
     I2C1_sendData(data);
     if (I2C1_getAckstatBit())
     {
-        return ;
+        /* Handle error */
+        dataSentSuccessful = 0;
     }
     
     I2C1_stopCondition();
     I2C1_close();
+    return dataSentSuccessful;
 }
 
-static void I2C1_writeNBytes(uint8_t address, uint8_t* data, size_t len)
+static uint8_t I2C1_writeNBytes(uint8_t address, uint8_t reg, uint8_t* data, size_t len)
 {
     /* Shift the 7 bit address and add a 0 bit to indicate write operation */
     uint8_t writeAddress = ((address << 1) & (~I2C_RW_BIT));
-    uint8_t reg = data[0];
+    uint8_t dataSentSuccessful = 1;
     
     I2C1_open();
     I2C1_startCondition();
@@ -195,26 +203,30 @@ static void I2C1_writeNBytes(uint8_t address, uint8_t* data, size_t len)
     I2C1_sendData(writeAddress);
     if (I2C1_getAckstatBit())
     {
-        return ;
+        /* Handle error */
+        dataSentSuccessful = 0;
     }
     
     I2C1_sendData(reg);
     if (I2C1_getAckstatBit())
     {
-        return ;
+        /* Handle error */
+        dataSentSuccessful = 0;
     }
-    
-    for(int i = 1; i<len; i++)
+
+    for(uint8_t i = 0; i < len; i++)
     {
         I2C1_sendData(*data++);
         if (I2C1_getAckstatBit())
         {
-            return ;
-         }   
+            /* Handle error */
+            dataSentSuccessful = 0;
+        } 
     }
     
     I2C1_stopCondition();
     I2C1_close();
+    return dataSentSuccessful;
 }
 
 int main(void)
@@ -224,24 +236,25 @@ int main(void)
     PPS_Initialize();
     PORT_Initialize();
     I2C1_Initialize();
-    
-    
-    /* Register address and data : [REGISTER, DATA1, DATA2] */
-    uint8_t data[3];
-    data[0] = TC1321_REG_ADDR;
-    data[1] = 0xFF;
-    data[2] = 0xC0;
-    
+
+    uint8_t data[DATALENGTH];
+    data[0] = DATA_HIGH;
+    data[1] = DATA_HIGH;
     while(1)
     {   
+        
         /* Write to DATA REGISTER in TC1321 */
-        I2C1_writeNBytes(I2C_CLIENT_ADDR, data, 3);
-        
-        /*Delay 1 second*/
-        __delay_ms(1000);
-        
-        /* Overwrite data with its inverse*/
-        data[1] = ~data[1];
-        data[2] = ~data[2];
-    }      
+        if (I2C1_writeNBytes(I2C_CLIENT_ADDR, TC1321_REG_ADDR, data, DATALENGTH))
+        {
+            /* Overwrite data with its inverse*/
+            data[0] = ~data[0];
+            data[1] = ~data[1];
+            /*Delay 1 second*/
+            __delay_ms(1000);
+        }
+        else
+        {    
+            /* Handle error */
+        }
+    }
 }
