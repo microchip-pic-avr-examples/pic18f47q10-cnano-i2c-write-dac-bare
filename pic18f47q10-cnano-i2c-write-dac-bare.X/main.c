@@ -54,10 +54,10 @@ static uint8_t I2C1_writeNBytes(uint8_t address, uint8_t reg, uint8_t* data, siz
 
 static void CLK_Initialize(void)
 {
-    /* Set Oscilator Source: HFINTOSC and Set Clock Divider: 1 */
+    /* Set Oscillator Source: HFINTOSC and Set Clock Divider: 1 */
     OSCCON1bits.NOSC = 0x6;
 
-    /* Set Nominal Freq: 4 MHz */
+    /* Set Nominal frequency: 4 MHz */
     OSCFRQbits.FRQ1 = 1;
 }
 
