@@ -2,7 +2,7 @@
     "metaDataVersion": "1.0.0",
     "category": "com.microchip.ide.project",
     "content": {
-        "metaDataVersion": "1.1.0",
+        "metaDataVersion": "1.0.0",
         "name": "com.microchip.mcu8.mplabx.project.pic18f47q10-cnano-i2c-write-dac-bare",
         "version": " ",
         "displayName": "",
