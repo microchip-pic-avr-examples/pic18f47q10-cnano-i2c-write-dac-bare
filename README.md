@@ -20,8 +20,8 @@ The PIC18F47Q10 configured in I2C Host Mode using the MSSP1 peripheral and perfo
 
 ## Software Used
 
-- MPLAB� X IDE 5.50.0 or newer [(MPLAB� X IDE 5.50)](https://www.microchip.com/en-us/development-tools-tools-and-software/mplab-x-ide?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_MMTCha_MPAE_Examples&utm_content=pic18f47q10-cnano-i2c-read-write-temp-sensor-bare-github)
-- MPLAB� XC8 2.32.0 or newer compiler [(MPLAB� XC8 2.32)](https://www.microchip.com/en-us/development-tools-tools-and-software/mplab-xc-compilers?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_MMTCha_MPAE_Examples&utm_content=pic18f47q10-cnano-i2c-read-write-temp-sensor-bare-github)
+- MPLAB®  X IDE 5.50.0 or newer [(MPLAB®  X IDE 5.50)](https://www.microchip.com/en-us/development-tools-tools-and-software/mplab-x-ide?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_MMTCha_MPAE_Examples&utm_content=pic18f47q10-cnano-i2c-read-write-temp-sensor-bare-github)
+- MPLAB® XC8 2.32.0 or newer compiler [(MPLAB®  XC8 2.32)](https://www.microchip.com/en-us/development-tools-tools-and-software/mplab-xc-compilers?utm_source=GitHub&utm_medium=TextLink&utm_campaign=MCU8_MMTCha_MPAE_Examples&utm_content=pic18f47q10-cnano-i2c-read-write-temp-sensor-bare-github)
 - Microchip PIC18F-Q Series Device Support 1.12.193 or newer [(packs.download.microchip.com/)](https://packs.download.microchip.com/)
 
 ## Hardware Used
