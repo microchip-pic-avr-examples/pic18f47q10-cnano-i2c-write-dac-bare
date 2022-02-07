@@ -4,7 +4,7 @@
     "content": {
         "metaDataVersion": "1.0.0",
         "name": "com.microchip.mcu8.mplabx.project.pic18f47q10-cnano-i2c-write-dac-bare",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "displayName": "I2C Host Write Data",
         "projectName": "pic18f47q10-cnano-i2c-write-dac-bare",
         "shortDescription": "Bare metal code for i2c write operations to a DAC using pic18f47q10 curiosity nano and the PICkit Serial I2C Demo Board",
